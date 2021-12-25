@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/samuelsih/url-shortener/helper"
 )
 
@@ -13,14 +15,22 @@ const port = ":8080"
 func main() {
 	mux := mux.NewRouter()
 
+	//load .env file
+	err := godotenv.Load()
+
+	if err != nil {
+		panic(err)
+	}
+
 	//path is map of shortened URL and real URL
 	//key = short version url
 	//value = real URL
 	path := map[string]string{
-		"/youtube" : "https://youtube.com",
-		"/github": "https://github.com/samuelsih", 
+		"/youtube" : os.Getenv("YOUTUBE_URL"),
+		"/github": os.Getenv("GITHUB_URL"), 
 	}
 
+	//mapHelper is variable for http.Handler comes from helper.go
 	mapHelper := helper.MapHelper(path, mux)
 
 	mux.HandleFunc("/", defaultResponse)
